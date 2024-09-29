@@ -39,30 +39,53 @@ def signup(request):
 
 @login_required
 def tasks(request):
-    tasks = Task.objects.filter(user=request.user, datecompleted__isnull=True)
-    return render(request, 'tasks.html',{'tasks':tasks})
+    # Mostrar solo las tareas pendientes que no son importantes
+    tasks = Task.objects.filter(user=request.user, datecompleted__isnull=True, important=False)
+    return render(request, 'tasks.html', {'tasks': tasks})
+
 
 @login_required
 def tasks_completed(request):
     tasks = Task.objects.filter(user=request.user, datecompleted__isnull=False).order_by('-datecompleted')
-    return render(request, 'tasks.html',{'tasks':tasks})
+    return render(request, 'tasks_completed.html', {'tasks': tasks})
+
+@login_required
+def complete_task(request, task_id):
+    task = get_object_or_404(Task, pk=task_id, user=request.user)
+    task.datecompleted = timezone.now()  # Marca la tarea como completada
+    task.save()
+    return redirect('tasks_completed')  # Redirige a Tareas Completadas
+
+
+@login_required
+def important_tasks(request):
+    tasks = Task.objects.filter(important=True, datecompleted__isnull=True, user=request.user)
+    return render(request, 'important_tasks.html', {'tasks': tasks})
+
+
 
 @login_required
 def create_task(request):
     if request.method == 'GET':
-        return render(request,"create_task.html",{'form': TaskForm})
+        return render(request, "create_task.html", {'form': TaskForm()})
     else:
         try:
             form = TaskForm(request.POST)
             new_task = form.save(commit=False)
             new_task.user = request.user
             new_task.save()
-            return redirect('tasks')
+            # Si es importante, redirige a tareas importantes
+            if new_task.important:
+                return redirect('important_tasks')
+            else:
+                return redirect('tasks')  # Si no es importante, redirige a tareas pendientes
         except ValueError:
-            return render(request,"create_task.html",{
-                'form': TaskForm,
+            return render(request, "create_task.html", {
+                'form': TaskForm(),
                 'error': 'Ingrese tipos de datos correctos'
-                })
+            })
+
+
 
 @login_required
 def task_detail(request, task_id):
@@ -88,20 +111,21 @@ def task_detail(request, task_id):
             'error':'Error updating tasks'
         })
 
-@login_required        
-def complete_task(request, task_id):
-    task = get_object_or_404(Task, pk=task_id, user=request.user) 
-    if request.method == 'POST':
-        task.datecompleted = timezone.now()
-        task.save()
-        return redirect('tasks')
 
-@login_required      
+
+@login_required
 def delete_task(request, task_id):
-    task = get_object_or_404(Task, pk=task_id, user=request.user) 
+    task = get_object_or_404(Task, pk=task_id, user=request.user)
     if request.method == 'POST':
         task.delete()
         return redirect('tasks')
+@login_required
+def mark_as_important(request, task_id):
+    task = get_object_or_404(Task, pk=task_id, user=request.user)
+    task.important = not task.important  # Alternar el valor de importante
+    task.save()
+    return redirect('important_tasks') if task.important else redirect('tasks')
+
 
 @login_required    
 def signout(request):

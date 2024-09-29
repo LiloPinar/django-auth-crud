@@ -16,30 +16,33 @@
             <span class="navbar-toggler-icon"></span>
           </button>
           <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav  ms-auto">
+            <ul class="navbar-nav ms-auto">
                 <li class="nav-item">
                     <a class="nav-link" href="/">Home</a>
                 </li>
                 
                 {% if user.is_authenticated %}
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'tasks' %}">Tasks Pending</a>
+                        <a class="nav-link" href="{% url 'tasks' %}">Tareas Pendientes</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'tasks_completed' %}">Tasks completed</a>
+                        <a class="nav-link" href="{% url 'tasks_completed' %}">Tareas Completadas</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="/tasks/create/">Create Task</a>
+                        <a class="nav-link" href="{% url 'important_tasks' %}">Tareas Importantes</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="/logout">Logout</a>
+                        <a class="nav-link" href="/tasks/create/">Crear Tarea</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/logout">Cerrar Sesion</a>
                     </li>
                 {% else %}    
-                    <li >
-                        <a class="nav-link" href="/signup">Signup</a>
+                    <li>
+                        <a class="nav-link" href="/signup">Registrarse</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="/signin">Signin</a>
+                        <a class="nav-link" href="/signin">Iniciar Sesion</a>
                     </li>
                 {% endif %}
             </ul>
@@ -47,8 +50,6 @@
         </div>
       </nav>
 
-    
-   
     {% block content %}
     {% endblock %}
 </body>
