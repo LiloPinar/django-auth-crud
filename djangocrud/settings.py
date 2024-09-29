@@ -1,6 +1,7 @@
 from pathlib import Path
 import os
-
+import dj_database_url
+from decouple import config
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -59,16 +60,13 @@ WSGI_APPLICATION = 'djangocrud.wsgi.application'
 
 # Database
 # Configuración explícita de la base de datos PostgreSQL
-DATABASES = {
-    'default': {
-        'NAME': os.environ.get('djangocrud_zmgj'), 
-        'USER': os.environ.get('djangocrud_zmgj_user'), 
-        'PASSWORD': os.environ.get('1TzIlQIohlR0Os28Li1P5fnN0VLtiPe1'),
-        'HOST': os.environ.get('DB_HOST', 'localhost'), 
-        'PORT': os.environ.get('DB_PORT', '5432'),
 
-    }
+DATABASES = {
+    'default': dj_database_url.config(
+        default=f"postgresql://{os.environ['DB_USER']}:{os.environ['DB_PASSWORD']}@{os.environ['DB_HOST']}:{os.environ['DB_PORT']}/{os.environ['DB_NAME']}"
+    )
 }
+
 
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [
@@ -105,3 +103,4 @@ LOGIN_URL = "/signin"
 
 # Default primary key field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+print("DB_PASSWORD:", os.environ.get('DB_PASSWORD'))
