@@ -62,11 +62,15 @@ WSGI_APPLICATION = 'djangocrud.wsgi.application'
 # Configuración explícita de la base de datos PostgreSQL
 
 DATABASES = {
-    'default': dj_database_url.config(
-        default=f"postgresql://{os.environ['DB_USER']}:{os.environ['DB_PASSWORD']}@{os.environ['DB_HOST']}:{os.environ['DB_PORT']}/{os.environ['DB_NAME']}"
-    )
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': config('DB_NAME'),
+        'USER': config('DB_USER'),
+        'PASSWORD': config('DB_PASSWORD'),
+        'HOST': config('DB_HOST'),
+        'PORT': config('DB_PORT', default='5432'),
+    }
 }
-
 
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [
